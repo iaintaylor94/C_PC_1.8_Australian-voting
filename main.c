@@ -86,7 +86,6 @@ int main(int argc, char *argv[]) {
   if (winner != 0) {
     printWinner(winner);
   }
-
   
   // Eliminate trailing candidate(s)
   int minVotes = trailingVotes();
