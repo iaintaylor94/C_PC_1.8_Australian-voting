@@ -79,7 +79,6 @@ int main(int argc, char *argv[]) {
 //      processVote ();
 //      break;
 //    }
-  
 
 
   // Determine and declare winner
