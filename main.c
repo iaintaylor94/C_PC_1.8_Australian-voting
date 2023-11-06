@@ -46,8 +46,7 @@ void printTree (struct treeNode *);
 int getNumElections (void);
 int getNumCandidates (void);
 char *getCandidateName (void);
-bool peek (FILE*);
-void getVotePath (int[]);
+bool getVotePath (int[]);
 void processVote (int[], struct treeNode*);
 
 void eliminateCandidate (struct treeNode *, int);
@@ -99,10 +98,14 @@ int main(int argc, char *argv[]) {
 
 
   
-  printf ("PROCESS VOTE\n");
+  printf ("GET VOTE PATH\n");
   int votePath [gNumCandidates];
-  while (peek(gInputFile) == false) { 
-    getVotePath(votePath);
+  while (getVotePath(votePath)) { 
+    for (int i = 0; i < gNumCandidates; i++) {
+      printf ("%d ",votePath[i]);
+    }
+    printf ("\n");
+    printf ("PROCESS VOTE\n");
     processVote (votePath, root);
   }
   
@@ -259,25 +262,40 @@ char *getCandidateName (void) {
   return name;
 }
 
-bool peek (FILE* fp) {
-  char c = fgetc(fp);
-  if (c == '\n') {
-    ungetc(c, fp);
-    return true;
-  }
-  else {
-    ungetc(c, fp);
+  /*
+printf ("PROCESS VOTE\n");
+int votePath [gNumCandidates];
+while (getVotePath(votePath)) { 
+  processVote (votePath, root);
+}
+*/
+
+// rewrite using fgets
+bool getVotePath (int p[]) {
+  char vpTemp [81];
+  fgets (vpTemp, 80, gInputFile);
+  
+  p[0] = 0;
+  int numCopied = sscanf (vpTemp, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+    &p[1], &p[2], &p[3], &p[4], &p[5], &p[6], &p[7], &p[8], &p[9], &p[10], 
+    &p[11], &p[12], &p[13], &p[14], &p[15], &p[16], &p[17], &p[18], &p[19], &p[20]);
+
+  if (numCopied == 0) {
+    printf ("END OF FILE:\n");
     return false;
   }
+  else {
+    printf ("COPIED LINE: ");
+    for (int i = 0; i < numCopied + 1; i++){
+      printf ("%d ", p[i]);
+    }
+    printf ("\n");
+    return true;
+  }
+  
   return false;
 }
-  
 
-void getVotePath (int p[]) {
-  for (int i = 1; i < gNumCandidates; i++) {
-    fscanf (gInputFile, "%d", &p[i]);
-  }
-}
 
 int trailingVotes (void) {
   int minVotes = INT_MAX;
