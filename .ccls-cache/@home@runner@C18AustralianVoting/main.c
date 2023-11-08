@@ -26,7 +26,7 @@ struct treeNode {
 // Define Variables
 int gNumElections;
 int gNumCandidates; // Actually used
-struct candidate gCandidates [gMaxCandidates];
+struct candidate gCandidates [gMaxCandidates]; // NOT part of tree
 
 // Declare Functions I/O
 void usage (char *);
@@ -98,38 +98,67 @@ int main(int argc, char *argv[]) {
 
 
   
-  printf ("PROCESS VOTE\n");
+  printf ("GET VOTE PATH\n");
   int votePath [gNumCandidates];
   while (getVotePath(votePath)) { 
     for (int i = 0; i < gNumCandidates; i++) {
       printf ("%d ",votePath[i]);
     }
     printf ("\n");
+    printf ("PROCESS VOTE\n");
     processVote (votePath, root);
   }
   
   printf ("PRINT TREE - DEPTH FIRST\n");
   printTree(root);
 
+  printf ("INITIALIZE NUMVOTES\n");
+  for (int i = 1; i < gNumCandidates; i++) {
+    gCandidates[i].votes = root->branches[i]->numVotes;
+  }
+
+  printf ("INITIALIZE BRANCH\n\n\n");
+  gCandidates[0].isEliminated = true;
+
+  
+
 
   
 
 
   // Determine and declare winner
-  int winner = isWinner();
-  if (winner != 0) {
-    printWinner(winner);
-  }
-  
-  // Eliminate trailing candidate(s)
-  int minVotes = trailingVotes();
+  while (isWinner() == 0) {
+    int minVotes = trailingVotes(); // 1 .. < gNumCandidates
 
-  for (int i = 0; i < gNumCandidates; i++) {
-    if (gCandidates[i].votes == minVotes) {
-      gCandidates[i].isEliminated = true;
-      eliminateCandidate(root, i);
+    printf ("candidate=votes: ");
+    for (int i = 1; i < gNumCandidates; i++) {
+      if (gCandidates[i].isEliminated == false) {
+        printf ("%s=%d ", gCandidates[i].name, gCandidates[i].votes);
+      }
+      else {
+        printf ("%s=%s ", gCandidates[i].name, "ELIMINATED");
+      }
+    }
+    printf ("\n");
+
+    for (int i = 1; i < gNumCandidates ; i++) {
+      printf ("Candidate [%d]: ", i);
+      if (gCandidates[i].isEliminated == true) {
+        printf ("ELIMINATED\n");
+      }
+      else if (gCandidates[i].votes == minVotes && gCandidates[i].isEliminated == false) {
+        printf ("TRAILING => ELIMINATE\n");
+        eliminateCandidate(root->branches[i], i);
+        gCandidates[i].isEliminated = true;
+      }
+      else {
+        printf ("NOT TRAILING\n");
+      }
     }
   }
+  
+  printWinner(isWinner());
+
       
 
   // Close File
@@ -261,18 +290,14 @@ char *getCandidateName (void) {
   return name;
 }
 
-  /*
-printf ("PROCESS VOTE\n");
-int votePath [gNumCandidates];
-while (getVotePath(votePath)) { 
-  processVote (votePath, root);
-}
-*/
 
-// rewrite using fgets
+// rewrite using fgets and sscanf
 bool getVotePath (int p[]) {
+  char vpTemp [81];
+  fgets (vpTemp, 80, gInputFile);
+  
   p[0] = 0;
-  int numCopied = fscanf (gInputFile, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+  int numCopied = sscanf (vpTemp, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
     &p[1], &p[2], &p[3], &p[4], &p[5], &p[6], &p[7], &p[8], &p[9], &p[10], 
     &p[11], &p[12], &p[13], &p[14], &p[15], &p[16], &p[17], &p[18], &p[19], &p[20]);
 
@@ -281,7 +306,12 @@ bool getVotePath (int p[]) {
     return false;
   }
   else {
-    printf ("COPIED LINE:\n");
+    printf ("COPIED LINE: ");
+    for (int i = 0; i < numCopied + 1; i++){
+      printf ("%d ", p[i]);
+    }
+    printf ("\n");
+    return true;
   }
   
   return false;
@@ -322,18 +352,67 @@ void processVote (int vp[], struct treeNode *rt) {
   }
 }
 
+
+/*
+struct treeNode {
+  struct treeNode *branches[gMaxCandidates];
+  int depth;
+  int path[gMaxCandidates];
+  int numVotes;
+};
+struct candidate {
+  char *name;
+  int votes;
+  bool isEliminated;
+};
+*/
 void eliminateCandidate (struct treeNode *t, int e) {
+  printf ("{ ");
+  for (int i = 0; i < t->depth; i++) {
+    printf ("%d ", t -> path[i]);
+  }
+  printf ("} ");
+  printf ("depth = %d\n", t->depth);
+
   for (int i = 1; i < gNumCandidates; i++) {
-    if (t->path[i] == true) {
+    if (inPath (i, t)) {
       // DO NOTHING
+      printf ("  { ");
+      for (int i = 0; i < t->depth; i++) {
+        printf ("%d ", t->path[i]);
+      }
+      printf ("%d ", i);
+      printf ("} ");
+      printf ("   DO NOTHING: ");
+      printf ("depth=%d", t->depth);
+      printf ("\n");
     }
-    if (gCandidates->isEliminated == true) {
+    else if (gCandidates[i].isEliminated == true) {
       // RECURSIVE
+      printf ("  { ");
+      for (int i = 0; i < t->depth; i++) {
+        printf ("%d ", t -> path[i]);
+      }
+      printf ("%d ", i);
+      printf ("} ");
+      printf ("   RECURSIVE: ");
+      printf ("depth=%d", t->depth);
+      printf ("\n");
       eliminateCandidate(t->branches[i], e);
     }
     else if (gCandidates[i].isEliminated == false) {
       // ADD VOTES
+      printf ("  { ");
+      for (int i = 0; i < t->depth; i++) {
+        printf ("%d ", t->path[i]);
+      }
+      printf ("%d ", i);
+      printf ("} ");
+      printf ("   ADD VOTES: from[%s]:to[%s]:%d ", gCandidates[i].name, gCandidates[i].name, t->numVotes);
+      printf ("depth=%d", t->depth);
+      printf ("\n");
       gCandidates[i].votes += t->numVotes;
     }
   }
+  printf ("\n");
 }
