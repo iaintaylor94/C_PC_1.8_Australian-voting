@@ -304,12 +304,6 @@ bool getVotePath (int p[]) {
   }
   else {
 //    printf ("COPIED LINE: ");
-    
-    for (int i = 0; i < numCopied + 1; i++){
-      printf ("%d ", p[i]);
-    }
-    printf ("\n");
-    
     return true;
     
   }
@@ -345,7 +339,7 @@ void processVote (int vp[], struct treeNode *rt) {
   else {
     rt->numVotes++;
 //    printf ("depth=%d: ", rt->depth);
-    printf ("PV_LEAF: \n");
+//    printf ("\n");
   }
 }
 
