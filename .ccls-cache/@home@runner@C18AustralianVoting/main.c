@@ -354,18 +354,6 @@ void processVote (int vp[], struct treeNode *rt) {
 
 
 /*
-struct treeNode {
-  struct treeNode *branches[gMaxCandidates];
-  int depth;
-  int path[gMaxCandidates];
-  int numVotes;
-};
-struct candidate {
-  char *name;
-  int votes;
-  bool isEliminated;
-};
-*/
 void eliminateCandidate (struct treeNode *t, int e) {
   printf ("{ ");
   for (int i = 0; i < t->depth; i++) {
@@ -411,7 +399,28 @@ void eliminateCandidate (struct treeNode *t, int e) {
       printf ("   ADD VOTES: from[%s]:to[%s]:%d ", gCandidates[i].name, gCandidates[i].name, t->numVotes);
       printf ("depth=%d", t->depth);
       printf ("\n");
-      gCandidates[i].votes += t->numVotes;
+      gCandidates[i].votes += t->branches[i]->numVotes;
+    }
+  }
+  printf ("\n");
+}
+*/
+
+
+void eliminateCandidate (struct treeNode *t, int e) {
+
+  for (int i = 1; i < gNumCandidates; i++) {
+    if (inPath (i, t)) {
+      // DO NOTHING
+    }
+    else if (gCandidates[i].isEliminated == true) {
+      // RECURSIVE
+      eliminateCandidate(t->branches[i], e);
+    }
+    else if (gCandidates[i].isEliminated == false) {
+      // ADD VOTES
+
+      gCandidates[i].votes += t->branches[i]->numVotes;
     }
   }
   printf ("\n");
