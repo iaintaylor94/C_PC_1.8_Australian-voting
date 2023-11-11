@@ -62,23 +62,20 @@ int main(int argc, char *argv[]) {
     exit (EXIT_FAILURE);
   }
   else {
-    fprintf (stderr, "%s opened for reading.\n" , argv[1]);
+//    fprintf (stderr, "%s opened for reading.\n" , argv[1]);
   }
-
-
-
-
-
 
   
   // Process votes - Fill tree
-  gNumElections = getNumElections(); printf ("numElections = %d\n", gNumElections);
-  gNumCandidates = getNumCandidates(); printf ("gNumCandidates = %d\n", gNumCandidates);
+  gNumElections = getNumElections(); //printf ("numElections = %d\n", gNumElections);
+  gNumCandidates = getNumCandidates(); //printf ("gNumCandidates = %d\n", gNumCandidates);
 
+   
   for (int i = 1; i < gNumCandidates; i++) {
     gCandidates[i].name = getCandidateName();
-    printf ("gCandidates[%d].name = %s\n", i, gCandidates[i].name);
+//    printf ("gCandidates[%d].name = %s\n", i, gCandidates[i].name);
   }
+  
 
   // Create candidate vote tree
   struct treeNode *root = (struct treeNode*) calloc(1, sizeof(struct treeNode));
@@ -88,36 +85,36 @@ int main(int argc, char *argv[]) {
   }
   root->depth = 0;
   root->numVotes = 0;
-  printf ("root->depth = %d\n", root->depth);
+//  printf ("root->depth = %d\n", root->depth);
 
 
 
   
-  printf ("CREATE TREE\n");
+//  printf ("CREATE TREE\n");
   createTree (root);
 
 
   
-  printf ("GET VOTE PATH\n");
+//  printf ("GET VOTE PATH\n");
   int votePath [gNumCandidates];
   while (getVotePath(votePath)) { 
-    for (int i = 0; i < gNumCandidates; i++) {
-      printf ("%d ",votePath[i]);
-    }
-    printf ("\n");
-    printf ("PROCESS VOTE\n");
+//    for (int i = 0; i < gNumCandidates; i++) {
+//      printf ("%d ",votePath[i]);
+//    }
+//    printf ("\n");
+//    printf ("PROCESS VOTE\n");
     processVote (votePath, root);
   }
   
-  printf ("PRINT TREE - DEPTH FIRST\n");
-  printTree(root);
+//  printf ("PRINT TREE - DEPTH FIRST\n");
+//  printTree(root);
 
-  printf ("INITIALIZE NUMVOTES\n");
+//  printf ("INITIALIZE NUMVOTES\n");
   for (int i = 1; i < gNumCandidates; i++) {
     gCandidates[i].votes = root->branches[i]->numVotes;
   }
 
-  printf ("INITIALIZE BRANCH\n\n\n");
+//  printf ("INITIALIZE BRANCH\n\n\n");
   gCandidates[0].isEliminated = true;
 
   
@@ -130,29 +127,29 @@ int main(int argc, char *argv[]) {
   while (isWinner() == 0) {
     int minVotes = trailingVotes(); // 1 .. < gNumCandidates
 
-    printf ("candidate=votes: ");
+//    printf ("candidate=votes: ");
     for (int i = 1; i < gNumCandidates; i++) {
       if (gCandidates[i].isEliminated == false) {
-        printf ("%s=%d ", gCandidates[i].name, gCandidates[i].votes);
+//        printf ("%s=%d ", gCandidates[i].name, gCandidates[i].votes);
       }
       else {
-        printf ("%s=%s ", gCandidates[i].name, "ELIMINATED");
+//        printf ("%s=%s ", gCandidates[i].name, "ELIMINATED");
       }
     }
-    printf ("\n");
+//    printf ("\n");
 
     for (int i = 1; i < gNumCandidates ; i++) {
-      printf ("Candidate [%d]: ", i);
+//      printf ("Candidate [%d]: ", i);
       if (gCandidates[i].isEliminated == true) {
-        printf ("ELIMINATED\n");
+//        printf ("ELIMINATED\n");
       }
       else if (gCandidates[i].votes == minVotes && gCandidates[i].isEliminated == false) {
-        printf ("TRAILING => ELIMINATE\n");
+//        printf ("TRAILING => ELIMINATE\n");
         eliminateCandidate(root->branches[i], i);
         gCandidates[i].isEliminated = true;
       }
       else {
-        printf ("NOT TRAILING\n");
+//        printf ("NOT TRAILING\n");
       }
     }
   }
@@ -302,19 +299,20 @@ bool getVotePath (int p[]) {
     &p[11], &p[12], &p[13], &p[14], &p[15], &p[16], &p[17], &p[18], &p[19], &p[20]);
 
   if (numCopied == 0) {
-    printf ("END OF FILE:\n");
+//    printf ("END OF FILE:\n");
     return false;
   }
   else {
-    printf ("COPIED LINE: ");
+//    printf ("COPIED LINE: ");
+    
     for (int i = 0; i < numCopied + 1; i++){
       printf ("%d ", p[i]);
     }
     printf ("\n");
+    
     return true;
+    
   }
-  
-  return false;
 }
 
 
@@ -332,23 +330,22 @@ int trailingVotes (void) {
 // vp[] =  { na, 1, 2, 3 }
 // depth = {  0, 1, 2, 3 }
 void processVote (int vp[], struct treeNode *rt) {
-  printf ("PV_INIT: ");
+//  printf ("PV_INIT: ");
   if (rt->depth == 0) {
-    printf ("depth=%d: ", rt->depth);
-    printf ("PV_ROOT: nextBranch=%d\n", vp[1]); // vp[0] is empty
+//    printf ("depth=%d: ", rt->depth);
+//    printf ("PV_ROOT: nextBranch=%d\n", vp[1]); // vp[0] is empty
     processVote (vp, rt->branches[vp[1]]);
   }
   else if (rt->depth  < gNumCandidates - 1) {
     rt->numVotes++;
-    printf ("depth=%d: ", rt->depth);
-    printf ("PV_BRANCH: nextBranch=%d\n", vp[rt->depth + 1]);
+//    printf ("depth=%d: ", rt->depth);
+//    printf ("PV_BRANCH: nextBranch=%d\n", vp[rt->depth + 1]);
     processVote (vp, rt->branches[vp[rt->depth + 1]]);
   }
   else {
     rt->numVotes++;
-    printf ("depth=%d: ", rt->depth);
+//    printf ("depth=%d: ", rt->depth);
     printf ("PV_LEAF: \n");
-    return;
   }
 }
 
