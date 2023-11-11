@@ -98,11 +98,13 @@ int main(int argc, char *argv[]) {
 //  printf ("GET VOTE PATH\n");
   int votePath [gNumCandidates];
   while (getVotePath(votePath)) { 
-//    for (int i = 0; i < gNumCandidates; i++) {
-//      printf ("%d ",votePath[i]);
-//    }
-//    printf ("\n");
-//    printf ("PROCESS VOTE\n");
+    /*
+    printf ("VOTE PATH: ");
+    for (int i = 1; i < gNumCandidates; i++) {
+      printf ("%d ", votePath[i]);
+    }
+    printf ("\n");
+    */
     processVote (votePath, root);
   }
   
@@ -288,25 +290,34 @@ char *getCandidateName (void) {
 }
 
 
-// rewrite using fgets and sscanf
+// get input using fgets and strtok()
 bool getVotePath (int p[]) {
+
   char vpTemp [81];
   fgets (vpTemp, 80, gInputFile);
-  
-  p[0] = 0;
-  int numCopied = sscanf (vpTemp, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-    &p[1], &p[2], &p[3], &p[4], &p[5], &p[6], &p[7], &p[8], &p[9], &p[10], 
-    &p[11], &p[12], &p[13], &p[14], &p[15], &p[16], &p[17], &p[18], &p[19], &p[20]);
+  for (int i = 0; i < 81; i++) {
+    if (vpTemp[i] == '\n') {
+      vpTemp[i] = '\0';
+      break;
+    }
+  }
 
-  if (numCopied == 0) {
-//    printf ("END OF FILE:\n");
+  char *token = strtok(vpTemp, " ");
+  // Detect empty string
+  if (token == NULL) {
     return false;
   }
   else {
-//    printf ("COPIED LINE: ");
-    return true;
+    p[1] = atoi(token);
+
+    for (int i = 2; i < gNumCandidates; i++) {
+      token = strtok(NULL, " ");
+      p[i] = atoi(token);
+    }
     
+    return true;
   }
+
 }
 
 
