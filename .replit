@@ -1,5 +1,5 @@
 compile = ["make", "-s"]
-run = "./main"
+run = "./main australian-voting.txt"
 entrypoint = "main.c"
 hidden = ["main", "main-debug", "**/*.o", "**/*.d", ".ccls-cache", "Makefile"]
 
