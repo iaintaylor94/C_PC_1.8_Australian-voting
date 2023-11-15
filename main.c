@@ -92,22 +92,15 @@ int main(int argc, char *argv[]) {
   
 //  printf ("CREATE TREE\n");
   createTree (root);
-//  printTree(root);
-  printf ("before process tree\n");
+
 
 //  printf ("GET VOTE PATH\n");
   int votePath [gNumCandidates];
   while (getVotePath(votePath)) {
     processVote(votePath, root);
-    printf ("\n");
   }
 
-//    printTree (root); // Works here
 
-  printf ("after process tree\n");
-
-//  printf ("PRINT TREE - DEPTH FIRST\n");
-//  printTree(root); // does not work here
 
 
 //  printf ("INITIALIZE NUMVOTES\n");
@@ -291,31 +284,31 @@ char *getCandidateName (void) {
 bool getVotePath (int p[]) {
 
   char vpTemp [81];
-  fgets (vpTemp, 80, gInputFile);
+  void *vpEOF = fgets (vpTemp, 80, gInputFile);
   for (int i = 0; i < 81; i++) {
     if (vpTemp[i] == '\n') {
-      printf ("converted newline\n");
+//      printf ("converted newline\n");
       vpTemp[i] = '\0';
       break;
     }
   }
-  printf ("vpTemp=%s\n", vpTemp);
+//  printf ("vpTemp=%s\n", vpTemp);
 
   // test for blank line
-  if (vpTemp[0] == '\0') {
-    printf ("Empty line\n");
+  if (vpEOF == NULL) { // EOF is the only character
+//    printf ("Empty line\n");
     return false;
   }
   else {
-    printf ("Process token\n");
+//    printf ("Process token\n");
     char *token = strtok(vpTemp, " ");
     p[1] = atoi (token);
-    printf ("%d ", p[1]);
+//    printf ("%d ", p[1]);
 
     for (int i = 2; i < gNumCandidates; i++) {
       token = strtok(NULL, " ");
       p[i] = atoi(token);
-      printf ("%d ", p[i]);
+//      printf ("%d ", p[i]);
     }
     return true;
   }
